@@ -42,7 +42,7 @@ RUN apt-get install -y --no-install-recommends \
     libglw1-mesa-dev \
     freeglut3-dev 
 
-RUN apt-get install -y --no-install-recommends boost
+RUN apt-get install -y --no-install-recommends libboost-dev
  
 # because, why not?
 RUN apt-get install -y --no-install-recommends sudo vim
