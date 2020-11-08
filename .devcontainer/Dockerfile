@@ -2,84 +2,67 @@
 FROM ubuntu:18.04
 
 # Base stuff
-RUN \
-  apt-get update && \
-  apt-get install -y software-properties-common && \
-  add-apt-repository -y ppa:webupd8team/java && \
-  apt-get update && \
-  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
-  apt-get install -y --no-install-recommends \
-    oracle-java8-installer \
-    unzip && \
-  rm -rf /var/cache/oracle-jdk8-installer
 
-# We still use GCC-5: https://askubuntu.com/a/1087368
+RUN apt-get update 
+# Setup what's needed to get the latest release of cmake (>3.10)
+RUN apt-get install -y apt-transport-https ca-certificates gnupg software-properties-common wget
 
-RUN \
-  apt-get update && \
-  apt-get install -y --no-install-recommends \
-    gcc-5 \
-    g++-5 \
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+
+
+RUN apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+RUN apt-get install -y --no-install-recommends cmake
+
+RUN apt-get install -y --no-install-recommends \
     libssl-dev \
     openssl \
     libtool \
     autoconf \
     automake \
     build-essential \
-    uuid-dev \
-    libxi-dev \
-    libopenal-dev \
-    libgl1-mesa-dev \
-    libglw1-mesa-dev \
-    freeglut3-dev && \
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 10 && \
-	update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 20 && \
-	update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 10 && \
-	update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 20 && \
-	update-alternatives --install /usr/bin/cc cc /usr/bin/gcc 30 && \
-	update-alternatives --set cc /usr/bin/gcc && \
-	update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++ 30 && \
-	update-alternatives --set c++ /usr/bin/g++
+    uuid-dev 
 
-RUN \
-  apt-get update && \
-  apt-get install -y --no-install-recommends \
-    clang-6.0 && \
-    update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-6.0 1000 && \
-    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-6.0 1000 && \
-    update-alternatives --config clang && \
-    update-alternatives --config clang++
-
-RUN \
-  apt-get install -y --no-install-recommends \
+RUN apt-get install -y --no-install-recommends \
     tofrodos \
-    cmake \
     curl \
     tree \
     silversearcher-ag \
     valgrind \
-    git \
-    python3.8 \
-    python-setuptools && \
-  ln -s /usr/bin/python3.8 /usr/local/bin/python && \
-  ln -s /usr/bin/python3.8/usr/local/bin/python2 && \
-  sh -c "echo \#\!/usr/bin/env bash > /usr/local/bin/easy_install" && \
-  sh -c "echo python /usr/lib/python2.7/dist-packages/easy_install.py $\* >> /usr/local/bin/easy_install" && \
-  chmod +x /usr/local/bin/easy_install
+    git 
 
-RUN apt-get install -y --no-install-recommends build-essential cmake libcairo2-dev libgraphicsmagick1-dev libpng-dev 
+RUN apt-get install -y --no-install-recommends \
+    libcairo2-dev \
+    libgraphicsmagick1-dev \
+    libpng-dev 
+
+RUN apt-get install -y --no-install-recommends \
+    libxi-dev \
+    libopenal-dev \
+    libgl1-mesa-dev \
+    libglw1-mesa-dev \
+    freeglut3-dev 
+
+RUN apt-get install -y --no-install-recommends boost
+ 
+# because, why not?
+RUN apt-get install -y --no-install-recommends sudo vim
+
+#RUN apt-get install -y --no-install-recommends clang-10
+RUN curl -SL https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz \
+ | tar -xJC . && \
+ mv clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04 clang_10 && \
+ echo "export PATH=/clang_10/bin:$PATH" >> ~/.bashrc && \
+ echo "export LD_LIBRARY_PATH=/clang_10/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
+
+#RUN echo ‘export PATH=/clang_10/bin:$PATH’ >> ~/.bashrc && echo ‘export LD_LIBRARY_PATH=/clang_10/lib:$LD_LIBRARY_PATH’ >> ~/.bashrc
+RUN git clone --recurse-submodules https://github.com/cpp-io2d/P0267_RefImpl
+RUN cd P0267_RefImpl && mkdir build && cd build && pwd && cmake .. && make install
 
 
 RUN apt-get autoremove
 
 
-# Add builder user
-RUN  useradd -r -u 2222 builder && \
-  mkdir -p /var/builder && \
-  chown builder: /var/builder && \
-  chown builder: $(readlink -f /usr/bin/java) && \
-  chmod +s $(readlink -f /usr/bin/java)
+#RUN rm -rf /var/lib/apt/lists/*
 
-USER builder
-WORKDIR /home/builder
-RUN mkdir -p /home/builder
+
+
