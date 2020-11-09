@@ -48,11 +48,11 @@ RUN apt-get install -y --no-install-recommends libboost-dev
 RUN apt-get install -y --no-install-recommends sudo vim
 
 #RUN apt-get install -y --no-install-recommends clang-10
-RUN curl -SL https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz \
- | tar -xJC . && \
- mv clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04 clang_10 && \
- echo "export PATH=/clang_10/bin:$PATH" >> ~/.bashrc && \
- echo "export LD_LIBRARY_PATH=/clang_10/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
+#RUN curl -SL https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz \
+# | tar -xJC . && \
+# mv clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04 clang_10 && \
+# echo "export PATH=/clang_10/bin:$PATH" >> ~/.bashrc && \
+# echo "export LD_LIBRARY_PATH=/clang_10/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
 
 #RUN echo ‘export PATH=/clang_10/bin:$PATH’ >> ~/.bashrc && echo ‘export LD_LIBRARY_PATH=/clang_10/lib:$LD_LIBRARY_PATH’ >> ~/.bashrc
 RUN git clone --recurse-submodules https://github.com/cpp-io2d/P0267_RefImpl
