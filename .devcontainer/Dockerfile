@@ -47,6 +47,8 @@ RUN apt-get install -y --no-install-recommends libboost-dev
 # because, why not?
 RUN apt-get install -y --no-install-recommends sudo vim
 
+RUN apt-get install -y --no-install-recommend gcc
+
 #RUN apt-get install -y --no-install-recommends clang-10
 #RUN curl -SL https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz \
 # | tar -xJC . && \
